@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "server": "node --watch src/server.js",
+    "server": "nodemon src/server.js",
     "lint": "eslint",
     "prepare": "husky install"
   },
@@ -10,12 +10,14 @@
     "eslint-plugin-import": "^2.26.0"
   },
   "dependencies": {
+    "@fastify/formbody": "^7.3.0",
     "@fastify/static": "^6.5.0",
     "@fastify/swagger": "^8.0.0",
     "@fastify/view": "^7.1.1",
     "fastify": "^4.9.1",
     "handlebars": "^4.7.7",
     "husky": "^8.0.1",
+    "nodemon": "^2.0.20",
     "pino-pretty": "^9.1.1"
   }
 }

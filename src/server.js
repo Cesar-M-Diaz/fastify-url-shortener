@@ -11,18 +11,14 @@ fastify.register(require('@fastify/swagger'), {
   }
 })
 
+fastify.register(require('@fastify/formbody'))
+
 fastify.register(require('@fastify/view'), {
   root: path.join(__dirname, 'views'),
   engine: {
     handlebars
   },
-  layout: 'layouts/index.hbs',
-  // options: {
-  //   partials: {
-  //     header: 'partials/header.hbs',
-  //     footer: 'partials/footer.hbs'
-  //   }
-  // }
+  layout: 'layouts/index.hbs'
 })
 
 fastify.register(require('@fastify/static'), {
