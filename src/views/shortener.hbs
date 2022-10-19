@@ -1,7 +1,15 @@
 <div>
-  <h1 class="shortener__url-title">shorten a url</h1>
+  <h1 class="shortener__url-title">{{title}}</h1>
+  {{#if shortenedUrl}}
+  <div>
+    <h3 class="shortener__url-input">localhost3000:/{{shortenedUrl}}</h3>
+    <input type="button" class="shortener__url-button" onclick="window.location.href='/{{shortenedUrl}}'" value="Go ahead and try it!">
+    <input type="button" class="shortener__url-button" onclick="window.location.href='/'" value="Shorten another url">
+  </div>
+  {{else}}
   <form action="/shorten" method="post">
     <input class="shortener__url-input" name="url" type="text" placeholder="enter a url">
     <input type="submit" class="shortener__url-button" value="Go !">
   </form>
+  {{/if}}
 </div>

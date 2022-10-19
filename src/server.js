@@ -13,6 +13,7 @@ fastify.register(require('@fastify/swagger'), {
 
 fastify.register(require('@fastify/formbody'))
 
+// TODO: see how to put load a default css template
 fastify.register(require('@fastify/view'), {
   root: path.join(__dirname, 'views'),
   engine: {
