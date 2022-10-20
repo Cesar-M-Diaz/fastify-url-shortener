@@ -1,9 +1,8 @@
 const { writeFile } = require('node:fs')
 const { readFile } = require('node:fs/promises')
 const { join } = require('node:path')
-// const urls = require('../data/urls.json')
-// const { postInfoOpts, userIdOpts } = require('./schemas')
-
+const { shortenOpts } = require('./schemas/shorten')
+// TODO: use a database, supabase ? postgress ? mongo ?
 // [
 //   {
 //     id: 'shortened url, comes from the param',
@@ -12,15 +11,13 @@ const { join } = require('node:path')
 // ]
 
 const urlDir = join(__dirname, '../data/urls.json')
-// TODO: add schemas to test if you have a url, regex in fastify ?
-// TODO: validate at the beginning if you are sending something, do this in handlebars
 
 function routes(fastify, options, done) {
   fastify.get('/', (req, reply) => {
     reply.code(200).view('shortener.hbs', { title: 'Shorten a url' })
   })
 
-  fastify.post('/shorten', async (req, reply) => {
+  fastify.post('/shorten', shortenOpts, async (req, reply) => {
     const { url: urlString } = req.body
     const parsedUrls = JSON.parse(await readFile(urlDir, 'utf8'))
     const findUrl = parsedUrls.find(({ url }) => url === urlString)
@@ -50,12 +47,14 @@ function routes(fastify, options, done) {
     return reply.redirect(302, findUrl.url)
   })
 
-  // TODO: set error.hbs styles
-  // fastify.setErrorHandler((error, req, reply) => {
-  //   reply.code(error.statusCode).view('error.hbs', {
-  //     message: 'test error'
-  //   })
-  // })
+  fastify.setErrorHandler((error, req, reply) => {
+    if (error.statusCode === 400) {
+      reply.code(400).view('error.hbs', {
+        message: '400',
+        subtitle: 'Please enter a valid url'
+      })
+    }
+  })
 
   done()
 }
