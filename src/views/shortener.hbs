@@ -2,8 +2,8 @@
   <h1 class="shortener__url-title">{{title}}</h1>
   {{#if shortenedUrl}}
   <div>
-    <h3 class="shortener__url-input">localhost3000:/{{shortenedUrl}}</h3>
-    <input type="button" class="shortener__url-button" onclick="window.location.href='/{{shortenedUrl}}'" value="Go ahead and try it!">
+    <h3 class="shortener__url-input">http://localhost:3000/{{shortenedUrl}}</h3>
+    <input type="button" class="shortener__url-button" onclick="window.open('http://localhost:3000/{{shortenedUrl}}', '_blank').focus()" value="Go ahead and try it!">
     <input type="button" class="shortener__url-button" onclick="window.location.href='/'" value="Shorten another url">
   </div>
   {{else}}
