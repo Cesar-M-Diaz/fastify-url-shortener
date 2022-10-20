@@ -27,6 +27,6 @@ fastify.register(require('@fastify/static'), {
 
 fastify.register(routes)
 
-fastify.listen({ port: 3000 }, (err) => {
+fastify.listen({ port: process.env.PORT || 3000 }, (err) => {
   if (err) throw err
 })

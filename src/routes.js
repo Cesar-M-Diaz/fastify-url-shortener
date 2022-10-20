@@ -2,7 +2,13 @@ const { writeFile } = require('node:fs')
 const { readFile } = require('node:fs/promises')
 const { join } = require('node:path')
 const { shortenOpts } = require('./schemas/shorten')
-// TODO: use a database, supabase ? postgress ? mongo ?
+
+// TODO: use https://www.npmjs.com/package/warehouse database
+// TODO: use standard instead of eslint
+// TODO: see when I should use ; or not in javascript
+// TODO: do postgres tutorial https://www.tutorialspoint.com/postgresql/index.htm
+// TODO: do postgres tutorial https://platzi.com/cursos/backend-nodejs-postgres/
+
 // [
 //   {
 //     id: 'shortened url, comes from the param',
@@ -33,7 +39,7 @@ function routes(fastify, options, done) {
       })
       return reply.code(200).view('shortener.hbs', { title: 'Heres your shortened url', shortenedUrl: `${newUrlObj.id}` })
     }
-
+    // TODO: check the right reply code
     return reply.code(200).view('shortener.hbs', { title: 'You already shortened this url', shortenedUrl: `${findUrl.id}` })
   })
 
