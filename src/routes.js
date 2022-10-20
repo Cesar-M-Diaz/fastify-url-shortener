@@ -44,25 +44,18 @@ function routes(fastify, options, done) {
     const { urlId } = req.params
     const parsedUrls = JSON.parse(await readFile(urlDir, 'utf8'))
     const findUrl = parsedUrls.find(({ id }) => id === urlId)
-    if (findUrl) {
-      // TODO: do a complete redirect to a page without localhost
-      reply.redirect(302, findUrl.url)
-    } else {
-      reply.code(404).view('error.hbs', { message: '404', subtitle: 'theres not a url shortened with the provided url' })
+    if (!findUrl) {
+      return reply.code(404).view('error.hbs', { message: '404', subtitle: 'It looks like this is not a valid url' })
     }
+    return reply.redirect(302, findUrl.url)
   })
 
-  // TODO: set styles to error.hbs
-  fastify.setErrorHandler((error, req, reply) => {
-    reply.code(error.statusCode).view('error.hbs', {
-      message: 'test error'
-    })
-  })
-
-  // TODO: this one is not working
-  fastify.setNotFoundHandler((req, reply) => {
-    reply.view('error.hbs', { message: '404', subtitle: 'Page not found' })
-  })
+  // TODO: set error.hbs styles
+  // fastify.setErrorHandler((error, req, reply) => {
+  //   reply.code(error.statusCode).view('error.hbs', {
+  //     message: 'test error'
+  //   })
+  // })
 
   done()
 }
