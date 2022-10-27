@@ -1,56 +1,43 @@
-const { writeFile } = require('node:fs')
-const { readFile } = require('node:fs/promises')
-const { join } = require('node:path')
 const { shortenOpts } = require('./schemas/shorten')
+const { Url, db } = require('../data/database')
 
-// TODO: use https://www.npmjs.com/package/warehouse database
-// TODO: use standard instead of eslint
-// TODO: see when I should use ; or not in javascript
+// TODO: use https://www.npmjs.com/package/warehouse database ✅
+// TODO: use standard instead of eslint ✅
+// TODO: see when I should use ; or not in javascript ✅
 // TODO: do postgres tutorial https://www.tutorialspoint.com/postgresql/index.htm
 // TODO: do postgres tutorial https://platzi.com/cursos/backend-nodejs-postgres/
 
-// [
-//   {
-//     id: 'shortened url, comes from the param',
-//     url: 'actual url to search for when I write a new short url'
-//   }
-// ]
-
-const urlDir = join(__dirname, '../data/urls.json')
-
-function routes(fastify, options, done) {
+function routes (fastify, options, done) {
   fastify.get('/', (req, reply) => {
     reply.code(200).view('shortener.hbs', { title: 'Shorten a url' })
   })
 
   fastify.post('/shorten', shortenOpts, async (req, reply) => {
     const { url: urlString } = req.body
-    const parsedUrls = JSON.parse(await readFile(urlDir, 'utf8'))
-    const findUrl = parsedUrls.find(({ url }) => url === urlString)
+    await db.load()
+    const findUrl = Url.findOne({ url: urlString })
 
-    if (findUrl === undefined) {
-      const randomId = (Math.random() + 1).toString(36).substring(7);
-      const newUrlObj = { id: randomId, url: urlString }
-      const newUrlsArr = [...parsedUrls, newUrlObj]
-      writeFile(urlDir, JSON.stringify(newUrlsArr), (error) => {
-        if (error) {
-          req.log.error(error)
-        }
-      })
-      return reply.code(200).view('shortener.hbs', { title: 'Heres your shortened url', shortenedUrl: `${newUrlObj.id}` })
+    if (findUrl) {
+      // 409: conflict, This response is sent when a request conflicts with the current state of the server. (client error)
+      return reply.code(409).view('shortener.hbs', { title: 'You already shortened this url', shortenedUrl: `${findUrl.url_id}` })
+    } else {
+      const randomId = (Math.random() + 1).toString(36).substring(7)
+      const newUrlObj = { url_id: randomId, url: urlString }
+      Url.insert(newUrlObj)
+      db.save()
+      return reply.code(201).view('shortener.hbs', { title: 'Heres your shortened url', shortenedUrl: `${newUrlObj.url_id}` })
     }
-    // TODO: check the right reply code
-    return reply.code(200).view('shortener.hbs', { title: 'You already shortened this url', shortenedUrl: `${findUrl.id}` })
   })
 
   fastify.get('/:urlId', async (req, reply) => {
     const { urlId } = req.params
-    const parsedUrls = JSON.parse(await readFile(urlDir, 'utf8'))
-    const findUrl = parsedUrls.find(({ id }) => id === urlId)
-    if (!findUrl) {
+    await db.load()
+    const findUrl = Url.findOne({ url_id: urlId })
+    if (findUrl) {
+      return reply.redirect(302, findUrl.url)
+    } else {
       return reply.code(404).view('error.hbs', { message: '404', subtitle: 'It looks like this is not a valid url' })
     }
-    return reply.redirect(302, findUrl.url)
   })
 
   fastify.setErrorHandler((error, req, reply) => {
