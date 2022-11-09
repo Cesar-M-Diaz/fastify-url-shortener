@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@fastify/formbody": "^7.3.0",
+    "@fastify/postgres": "^5.1.0",
     "@fastify/static": "^6.5.0",
     "@fastify/swagger": "^8.0.0",
     "@fastify/view": "^7.1.1",

@@ -3,12 +3,13 @@ const path = require('node:path')
 const handlebars = require('handlebars')
 const routes = require('./routes')
 
-fastify.register(require('@fastify/swagger'), {
-  exposeRoute: true,
-  routePrefix: 'docs',
-  swagger: {
-    info: { title: 'url-shortener-api' }
-  }
+fastify.register(require('@fastify/postgres'), {
+  // connectionString: 'postgres://postgres:vacivusVoid1@@localhost:5432/urls'
+  user: 'postgres',
+  host: 'localhost',
+  database: 'urls',
+  password: 'vacivusVoid1@',
+  port: 5432
 })
 
 fastify.register(require('@fastify/formbody'))
