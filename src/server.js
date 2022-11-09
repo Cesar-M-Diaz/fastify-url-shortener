@@ -1,14 +1,14 @@
+require('dotenv').config()
 const fastify = require('fastify')()
 const path = require('node:path')
 const handlebars = require('handlebars')
 const routes = require('./routes')
 
 fastify.register(require('@fastify/postgres'), {
-  // connectionString: 'postgres://postgres:vacivusVoid1@@localhost:5432/urls'
   user: 'postgres',
   host: 'localhost',
   database: 'urls',
-  password: 'vacivusVoid1@',
+  password: process.env.PASSWORD,
   port: 5432
 })
 
