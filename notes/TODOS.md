@@ -8,6 +8,9 @@
 - add postgres db to project ✅
 - unions joins sub queries ✅
 - Research about basic server security and main API risks (OWASP top 10)
+  <https://owasp.org/www-project-api-security/#>
+  <https://apisecurity.io/encyclopedia/content/owasp/owasp-api-security-top-10>
+  <https://www.npmjs.com/package/@fastify/helmet>
 - add user and show user urls, delete and see urls (use joins)
 - db migrations, include the user_id with an ALTER TABLE
   <https://www.fastify.io/docs/latest/Guides/Database/#migrations>
@@ -15,5 +18,8 @@
 - use an auth system for the app, fastify/auth is the simplest one, also you can use fastify/jwt
   <https://github.com/fastify/fastify-auth>
   <https://github.com/fastify/fastify-jwt>
+- research ORMS, sequelize is the most used, but prisma looks good to
+  <https://www.npmjs.com/package/sequelize-fastify>
+  <https://www.npmjs.com/package/@prisma/client>
 
 > We use Amazon RDS for postgres <https://aws.amazon.com/rds/postgresql/>
