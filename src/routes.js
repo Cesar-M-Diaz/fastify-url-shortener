@@ -1,14 +1,5 @@
 const { shortenOpts } = require('./schemas/shorten')
 
-// TODO: use https://www.npmjs.com/package/warehouse database ✅
-// TODO: use standard instead of eslint ✅
-// TODO: see when I should use ; or not in javascript ✅
-// TODO: do postgres tutorial https://www.tutorialspoint.com/postgresql/index.htm
-// TODO: do postgres tutorial https://platzi.com/cursos/backend-nodejs-postgres/ in progress
-// TODO: add postgres db to project ✅
-// unions joins sub queries
-// seguridad servidores, principales riesgos API
-
 function routes (fastify, options, done) {
   fastify.get('/', (req, reply) => {
     reply.code(200).view('shortener.hbs', { title: 'Shorten a url' })
