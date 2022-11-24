@@ -3,6 +3,7 @@ const fastify = require('fastify')()
 const path = require('node:path')
 const handlebars = require('handlebars')
 const routes = require('./routes')
+const migrate = require('../migrate')
 
 fastify.register(require('@fastify/postgres'), {
   user: 'postgres',
@@ -28,6 +29,14 @@ fastify.register(require('@fastify/static'), {
 
 fastify.register(routes)
 
-fastify.listen({ port: process.env.PORT || 3000 }, (err) => {
-  if (err) throw err
-})
+const start = async () => {
+  try {
+    await migrate()
+    await fastify.listen({ port: 3000 })
+  } catch (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+}
+
+start()
