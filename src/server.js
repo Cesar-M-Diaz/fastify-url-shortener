@@ -6,11 +6,11 @@ const routes = require('./routes')
 const migrate = require('../migrate')
 
 fastify.register(require('@fastify/postgres'), {
-  user: 'postgres',
-  host: 'localhost',
-  database: 'urls',
-  password: process.env.PASSWORD,
-  port: 5432
+  host: process.env.HOST,
+  port: process.env.PORT,
+  database: process.env.DATABASE,
+  user: process.env.USER_POSTGRES,
+  password: process.env.PASSWORD
 })
 
 fastify.register(require('@fastify/formbody'))

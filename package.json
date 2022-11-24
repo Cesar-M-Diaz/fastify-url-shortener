@@ -3,11 +3,11 @@
     "server": "nodemon src/server.js",
     "lint": "standard",
     "fix-lint": "standard --fix",
-    "prepare": "husky install",
-    "migrate": "node migrate.mjs"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@fastify/formbody": "^7.3.0",
+    "@fastify/jwt": "^6.3.3",
     "@fastify/postgres": "^5.1.0",
     "@fastify/static": "^6.5.0",
     "@fastify/swagger": "^8.0.0",

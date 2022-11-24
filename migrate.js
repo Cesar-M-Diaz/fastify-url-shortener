@@ -6,10 +6,10 @@ const path = require('path')
 
 async function migrate () {
   const client = new pg.Client({
-    host: 'localhost',
-    port: 5432,
-    database: 'urls',
-    user: 'postgres',
+    host: process.env.HOST,
+    port: process.env.PORT,
+    database: process.env.DATABASE,
+    user: process.env.USER_POSTGRES,
     password: process.env.PASSWORD
   })
 
@@ -29,9 +29,9 @@ async function migrate () {
       console.log(
         'No migrations run for schema "public". Already at the latest one.'
       )
+    } else {
+      console.log('Migration done.')
     }
-
-    console.log('Migration done.')
 
     process.exitCode = 0
   } catch (err) {
