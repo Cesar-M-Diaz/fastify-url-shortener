@@ -2,8 +2,8 @@ require('dotenv').config()
 const fastify = require('fastify')()
 const path = require('node:path')
 const handlebars = require('handlebars')
-const routes = require('./routes')
-const migrate = require('../migrate')
+const routes = require('./routes/routes')
+const migrate = require('./utils/migrate')
 
 fastify.register(require('@fastify/postgres'), {
   host: process.env.HOST,
@@ -26,6 +26,8 @@ fastify.register(require('@fastify/view'), {
 fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '/../public')
 })
+
+fastify.register(require('./plugins/athenticate'))
 
 fastify.register(routes)
 

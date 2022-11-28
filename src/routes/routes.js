@@ -1,8 +1,13 @@
-const { shortenOpts } = require('./schemas/shorten')
+const { shortenOpts } = require('../schemas/shorten')
 
 function routes (fastify, options, done) {
-  fastify.get('/', (req, reply) => {
-    reply.code(200).view('shortener.hbs', { title: 'Shorten a url' })
+  fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    await reply.code(200).view('shortener.hbs', { title: 'Shorten a url' })
+  })
+
+  fastify.post('/register', async (req, reply) => {
+    const token = await fastify.jwt.sign({ name: 'random user' })
+    return reply.send({ token })
   })
 
   fastify.post('/shorten', shortenOpts, async (req, reply) => {
@@ -29,7 +34,7 @@ function routes (fastify, options, done) {
     }
   })
 
-  fastify.get('/:urlId', async (req, reply) => {
+  fastify.get('/url/:urlId', async (req, reply) => {
     const client = await fastify.pg.connect()
     const { urlId } = req.params
     try {
@@ -47,14 +52,16 @@ function routes (fastify, options, done) {
     }
   })
 
-  fastify.setErrorHandler((error, req, reply) => {
-    if (error.statusCode === 400) {
-      reply.code(400).view('error.hbs', {
-        message: '400',
-        subtitle: 'Please enter a valid url'
-      })
-    }
-  })
+  // heres a conflict with jwt and the error handler
+  // research the best practices for handling error codes.
+  // fastify.setErrorHandler((error, req, reply) => {
+  //   if (error.statusCode === 400) {
+  //     reply.code(400).view('error.hbs', {
+  //       message: '400',
+  //       subtitle: 'Please enter a valid url'
+  //     })
+  //   }
+  // })
 
   done()
 }
