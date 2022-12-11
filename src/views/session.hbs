@@ -1,0 +1,11 @@
+<div>
+  <form action={{action}} method="post">
+    <input class="shortener__url-input" name="email" type="text" placeholder="enter your email">
+    <input class="shortener__url-input" name="password" type="password" placeholder="enter your password">
+    {{#if error}}
+    <p>{{error}}</p>
+    {{/if}}
+    <input type="submit" class="shortener__url-button" value={{button}}>
+    <input type="button" class="shortener__url-button" onclick="window.location.href='/welcome'" value="Home">
+  </form>
+</div>

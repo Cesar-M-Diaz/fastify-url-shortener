@@ -27,7 +27,9 @@ fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '/../public')
 })
 
-fastify.register(require('./plugins/athenticate'))
+fastify.register(require('@fastify/cookie'))
+
+fastify.register(require('./plugins/authenticate'))
 
 fastify.register(routes)
 

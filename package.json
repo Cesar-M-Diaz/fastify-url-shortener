@@ -6,6 +6,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@fastify/cookie": "^8.3.0",
     "@fastify/formbody": "^7.3.0",
     "@fastify/jwt": "^6.4.0",
     "@fastify/postgres": "^5.1.0",
@@ -22,6 +23,7 @@
     "pino-pretty": "^9.1.1",
     "postgrator": "^5.0.1",
     "standard": "^17.0.0",
+    "uuid": "^9.0.0",
     "warehouse": "^4.0.2"
   }
 }
