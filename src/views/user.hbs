@@ -1,6 +1,42 @@
+{{#if urls}}
+  <h1 class="shortener__url-title" style="text-align: center;">Your saved urls</h1>
+{{else}}
+  <h1 class="shortener__url-title" style="text-align: center;">You don't have any saved urls</h1>
+{{/if}}
 <div>
-  <h1 class="shortener__url-title" style="text-align: center;">User profile</h1>
-  {{#each urls}}
-    <p>{{id}}</p>
-  {{/each}}
+{{#each urls}}
+  <h3 class="shortener__url-input" id={{id}}>http://localhost:3000/url/{{id}}</h3>
+  <input type="button" class="shortener__url-button" onclick="showUrl('{{url}}', '{{id}}')" value="show original url">
+  <input type="button" class="shortener__url-button" onclick="window.open('http://localhost:3000/url/{{id}}', '_blank').focus()" value="visit url">
+  <input type="button" class="shortener__url-button" onclick="deleteURL('{{id}}')" value="delete">
+{{/each}}
 </div>
+{{#if urls}}
+  <input type="button" class="shortener__url-button" onclick="window.location = '/'" value="home">
+{{else}}
+  <input type="button" class="shortener__url-button" onclick="window.location = '/'" value="Shorten a url">
+{{/if}}
+<form action="/logout" method="post">
+  <input type="submit" class="shortener__url-button" value="log out">
+</form>
+<script>
+  function showUrl(url, id) {
+    const input = document.getElementById(id)
+    const shortened = 'http://localhost:3000/url/' + id
+
+    if (input.innerHTML === url) {
+      input.innerHTML = shortened
+      event.target.value = 'show original url'
+    } else {
+      input.innerHTML = url
+      event.target.value = 'show shortened url'
+    }
+  }
+
+  async function deleteURL(id) {
+    await fetch(`/url/${id}`, {
+      method: 'DELETE'
+    })
+    window.location.href = '/user-urls'
+  }
+</script>

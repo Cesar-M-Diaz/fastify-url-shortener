@@ -1,4 +1,4 @@
-const shortenOpts = {
+const userOpts = {
   schema: {
     body: {
       type: 'object',
@@ -10,10 +10,9 @@ const shortenOpts = {
         }
       }
     }
-  },
-  attachValidation: true
+  }
 }
 
 module.exports = {
-  shortenOpts
+  userOpts
 }

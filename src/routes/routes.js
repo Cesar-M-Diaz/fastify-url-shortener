@@ -18,7 +18,7 @@ function routes (fastify, options, done) {
     await reply.code(200).view('session.hbs', { button: 'Login', action: '/login' })
   })
 
-  fastify.get('/user', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+  fastify.get('/user-urls', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     const client = await fastify.pg.connect()
 
     const userId = req.user.id
@@ -27,7 +27,10 @@ function routes (fastify, options, done) {
       const { rows } = await client.query(
         'SELECT id, url FROM urls WHERE user_id=$1', [userId]
       )
-      return reply.code(200).view('user.hbs', { urls: rows })
+
+      const hbsObj = rows.length > 0 ? { urls: rows } : {}
+
+      return reply.code(200).view('user.hbs', hbsObj)
     } catch (err) {
       return reply.send(err)
     }
@@ -104,6 +107,10 @@ function routes (fastify, options, done) {
     const user = fastify.jwt.decode(req.cookies.token)
     const userId = user.id
 
+    if (req.validationError) {
+      return reply.code(400).view('error.hbs', { message: '400', subtitle: 'Please enter a valid url' })
+    }
+
     try {
       const { rows } = await client.query(
         'SELECT id, url FROM urls WHERE url=$1', [urlString]
@@ -118,7 +125,7 @@ function routes (fastify, options, done) {
       )
       return reply.code(201).view('shortener.hbs', { title: 'Heres your shortened url', shortenedUrl: `${inserted.rows[0].id}` })
     } catch (e) {
-      return reply.code(400).view('error.hbs', { message: '400', subtitle: 'Please enter a valid url' })
+      return reply.send(e)
     } finally {
       client.release()
     }
@@ -142,6 +149,26 @@ function routes (fastify, options, done) {
     }
   })
 
+  fastify.delete('/url/:urlId', async (req, reply) => {
+    const client = await fastify.pg.connect()
+    const { urlId } = req.params
+
+    const user = fastify.jwt.decode(req.cookies.token)
+    const userId = user.id
+
+    try {
+      await client.query('DELETE FROM urls WHERE id=$1', [urlId])
+      const { rows } = await client.query(
+        'SELECT id, url FROM urls WHERE user_id=$1', [userId]
+      )
+      return reply.code(200).view('user.hbs', { urls: rows })
+    } catch (e) {
+      return reply.send(e)
+    } finally {
+      client.release()
+    }
+  })
+
   fastify.post('/logout', async (req, reply) => {
     const token = ''
     return reply.setCookie('token', token, {
@@ -153,15 +180,6 @@ function routes (fastify, options, done) {
 
   fastify.setNotFoundHandler((req, reply) => {
     reply.view('error.hbs', { message: '404', subtitle: 'Page not found' })
-  })
-
-  fastify.setErrorHandler((error, req, reply) => {
-    if (error.statusCode === 400) {
-      reply.code(400).view('error.hbs', {
-        message: '400',
-        subtitle: 'Please enter a valid url'
-      })
-    }
   })
 
   done()
