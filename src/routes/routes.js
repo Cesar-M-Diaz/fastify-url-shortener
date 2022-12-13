@@ -1,4 +1,5 @@
-const { shortenOpts } = require('../schemas/shorten')
+const { shortenOpts, userOpts } = require('../schemas/schemas')
+const errorValidator = require('../utils/validationErr')
 const { v4: uuidv4 } = require('uuid')
 
 function routes (fastify, options, done) {
@@ -36,10 +37,12 @@ function routes (fastify, options, done) {
     }
   })
 
-  fastify.post('/login', async (req, reply) => {
+  fastify.post('/login', userOpts, async (req, reply) => {
     const client = await fastify.pg.connect()
 
     const { email, password } = req.body
+
+    if (req.validationError) return errorValidator(reply, req.validationError.message, 'login', email, password)
 
     try {
       const { rows } = await client.query(
@@ -67,17 +70,19 @@ function routes (fastify, options, done) {
     }
   })
 
-  fastify.post('/register', async (req, reply) => {
+  fastify.post('/register', userOpts, async (req, reply) => {
     const client = await fastify.pg.connect()
 
     const { email, password } = req.body
+
+    if (req.validationError) return errorValidator(reply, req.validationError.message, 'register', email, password)
 
     try {
       const { rows } = await client.query(
         'SELECT email FROM users WHERE email=$1 ', [email]
       )
 
-      if (rows[0].email) {
+      if (rows.length !== 0) {
         return reply.code(400).view('session.hbs', { error: 'email already exist, please try with another email' })
       }
 
@@ -94,6 +99,7 @@ function routes (fastify, options, done) {
         sameSite: true
       }).redirect(302, '/')
     } catch (error) {
+      console.log('here')
       return reply.send(error)
     } finally {
       client.release()
@@ -107,9 +113,7 @@ function routes (fastify, options, done) {
     const user = fastify.jwt.decode(req.cookies.token)
     const userId = user.id
 
-    if (req.validationError) {
-      return reply.code(400).view('error.hbs', { message: '400', subtitle: 'Please enter a valid url' })
-    }
+    if (req.validationError) return errorValidator(reply, req.validationError.message)
 
     try {
       const { rows } = await client.query(
@@ -170,8 +174,7 @@ function routes (fastify, options, done) {
   })
 
   fastify.post('/logout', async (req, reply) => {
-    const token = ''
-    return reply.setCookie('token', token, {
+    return reply.setCookie('token', '', {
       httpOnly: true,
       sameSite: true,
       expires: new Date()

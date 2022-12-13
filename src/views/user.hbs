@@ -1,18 +1,24 @@
 {{#if urls}}
-  <h1 class="shortener__url-title" style="text-align: center;">Your saved urls</h1>
+  <h1 class="shortener__url-title" style="text-align: center;" id="title">Your saved urls</h1>
 {{else}}
   <h1 class="shortener__url-title" style="text-align: center;">You don't have any saved urls</h1>
 {{/if}}
-<div>
+<div id="urls-list">
 {{#each urls}}
-  <h3 class="shortener__url-input" id={{id}}>http://localhost:3000/url/{{id}}</h3>
-  <input type="button" class="shortener__url-button" onclick="showUrl('{{url}}', '{{id}}')" value="show original url">
-  <input type="button" class="shortener__url-button" onclick="window.open('http://localhost:3000/url/{{id}}', '_blank').focus()" value="visit url">
-  <input type="button" class="shortener__url-button" onclick="deleteURL('{{id}}')" value="delete">
+  <div id={{id}} class="shortener__user-url__container">
+    <div style="width: 70%; margin-right: 20px;">
+      <h3 class="shortener__url-input__list" id='{{id}}input' style="word-break: break-all; overflow: hidden;">http://localhost:3000/url/{{id}}</h3>
+      <input type="button" class="shortener__url-button__list" onclick="showUrl('{{url}}', '{{id}}')" value="show original url">
+    </div>
+    <div style="width: 30%;">
+      <input type="button" id='{{id}}button' class="shortener__url-button__list" onclick="window.open('http://localhost:3000/url/{{id}}', '_blank').focus()" value="visit url">
+      <input type="button" class="shortener__url-button__list" onclick="deleteURL('{{id}}')" value="delete">
+    </div>
+  </div>
 {{/each}}
 </div>
 {{#if urls}}
-  <input type="button" class="shortener__url-button" onclick="window.location = '/'" value="home">
+  <input type="button" class="shortener__url-button" id="button" onclick="window.location = '/'" value="home">
 {{else}}
   <input type="button" class="shortener__url-button" onclick="window.location = '/'" value="Shorten a url">
 {{/if}}
@@ -21,22 +27,37 @@
 </form>
 <script>
   function showUrl(url, id) {
-    const input = document.getElementById(id)
+    const input = document.getElementById(id+'input')
+    const button = document.getElementById(id+'button')
     const shortened = 'http://localhost:3000/url/' + id
 
     if (input.innerHTML === url) {
       input.innerHTML = shortened
       event.target.value = 'show original url'
+      button.style.height = '55px'
+      input.style.height = '55px'
     } else {
       input.innerHTML = url
       event.target.value = 'show shortened url'
+      if (url.length > 64) {
+        button.style.height = '110px'
+        input.style.height = '110px'
+      }
     }
   }
 
   async function deleteURL(id) {
-    await fetch(`/url/${id}`, {
-      method: 'DELETE'
-    })
-    window.location.href = '/user-urls'
+    try {
+      await fetch(`/url/${id}`, {
+        method: 'DELETE'
+      })
+      document.getElementById(id).remove()
+      if (document.getElementById('urls-list').innerText === '') {
+        document.getElementById('title').innerHTML = "You don't have any saved urls"
+        document.getElementById('button').value = "Shorten a url"
+      }
+    } catch (e) {
+      console.log(e)
+    }
   }
 </script>

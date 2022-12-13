@@ -1,9 +1,9 @@
 <div>
   <form action={{action}} method="post">
-    <input class="shortener__url-input" name="email" type="text" placeholder="enter your email">
-    <input class="shortener__url-input" name="password" type="password" placeholder="enter your password">
+    <input class="shortener__url-input" name="email" type="text" placeholder="enter your email" value={{email}}>
+    <input class="shortener__url-input" name="password" type="password" placeholder="enter your password" value={{password}}>
     {{#if error}}
-    <p>{{error}}</p>
+    <p class="shortener__error">{{error}}</p>
     {{/if}}
     <input type="submit" class="shortener__url-button" value={{button}}>
     <input type="button" class="shortener__url-button" onclick="window.location.href='/welcome'" value="Home">

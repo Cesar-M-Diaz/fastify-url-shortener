@@ -1,4 +1,5 @@
 require('dotenv').config()
+// const fastify = require('fastify')({logger:true})
 const fastify = require('fastify')()
 const path = require('node:path')
 const handlebars = require('handlebars')
