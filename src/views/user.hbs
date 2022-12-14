@@ -63,17 +63,25 @@
   }
 
   function download() {
+    // had to use a handlebars helper to format handlebars variables
     const data = {{json urls}}
+    // change the id attribute to have the complete shortened url
     const transformedData = data.map(obj => {
       const newObj = { shortened: 'http://localhost:3000/url/' + obj.id, url: obj.url }
       return newObj
     })
+
+    // the 3 at the end is the number of spaces to format the json
     const formatData = JSON.stringify(transformedData, null, 3)
 
+    // octet-stream is raw binary data
     const blob = new Blob([formatData], { type: "octet-stream" })
-
+    // files then is inside of the link for download, the link exist in browser memory
+    // URL. create a url for the blob
+    // url is stored in memory and must be removed at the end
     const href = URL.createObjectURL(blob)
 
+    // way to add properties to an element, make a temporary a tag to download the information
     const a = Object.assign(document.createElement('a'), {
       href,
       style: "display:none",
@@ -82,6 +90,7 @@
     document.body.appendChild(a)
 
     a.click()
+    // remove url
     URL.revokeObjectURL(href)
     a.remove()
   }
