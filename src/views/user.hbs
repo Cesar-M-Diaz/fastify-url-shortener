@@ -19,6 +19,7 @@
 </div>
 {{#if urls}}
   <input type="button" class="shortener__url-button" id="button" onclick="window.location = '/'" value="home">
+  <input type="button" class="shortener__url-button" onclick="download()" value="download urls">
 {{else}}
   <input type="button" class="shortener__url-button" onclick="window.location = '/'" value="Shorten a url">
 {{/if}}
@@ -60,4 +61,29 @@
       console.log(e)
     }
   }
+
+  function download() {
+    const data = {{json urls}}
+    const transformedData = data.map(obj => {
+      const newObj = { shortened: 'http://localhost:3000/url/' + obj.id, url: obj.url }
+      return newObj
+    })
+    const formatData = JSON.stringify(transformedData, null, 3)
+
+    const blob = new Blob([formatData], { type: "octet-stream" })
+
+    const href = URL.createObjectURL(blob)
+
+    const a = Object.assign(document.createElement('a'), {
+      href,
+      style: "display:none",
+      download: 'my-urls.json'
+    })
+    document.body.appendChild(a)
+
+    a.click()
+    URL.revokeObjectURL(href)
+    a.remove()
+  }
+
 </script>

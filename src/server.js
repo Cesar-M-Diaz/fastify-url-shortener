@@ -34,6 +34,10 @@ fastify.register(require('./plugins/authenticate'))
 
 fastify.register(routes)
 
+handlebars.registerHelper('json', function (obj) {
+  return new handlebars.SafeString(JSON.stringify(obj))
+})
+
 const start = async () => {
   try {
     await migrate()
