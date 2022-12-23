@@ -6,9 +6,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
 </head>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300&display=swap');
+<style nonce={{styleN}}>
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/Silkscreen-Regular.ttf) format('trueType');
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 700;
+  src: url(/fonts/Silkscreen-Bold.ttf) format('trueType');
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 200;
+  src: url(/fonts/Ubuntu-Light.ttf) format('trueType');
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 300;
+  src: url(/fonts/Ubuntu-Regular.ttf) format('trueType');
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/Ubuntu-Medium.ttf) format('trueType');
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 700;
+  src: url(/fonts/Ubuntu-Bold.ttf) format('trueType');
+}
 
   body {
     padding: 0;
@@ -35,14 +74,24 @@
     justify-content: space-around;
   }
 
+  .shortener__url-title_users,
+  .shortener__url-title-welcome,
   .shortener__url-title {
     font-family: 'Silkscreen', monospace;
     font-weight: 700;
     font-size: 80px;
   }
 
+  .shortener__url-title-welcome {
+    text-align: center;
+  }
+
+  .shortener__url-title_users {
+    text-align: center;
+  }
+
   .shortener__url-input {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Ubuntu', sans-serif;
     box-sizing: border-box;
     margin-top: 50px;
     height: 55px;
@@ -99,6 +148,15 @@
     margin-bottom: 20px;
   }
 
+    .shortener__user-url__container div:first-of-type {
+    width: 70%; 
+    margin-right: 20px
+  }
+
+  .shortener__user-url__container div:last-of-type {
+    width: 30%;
+  }
+
     .shortener__url-button__list {
     box-sizing: border-box;
     margin: 0 0 15px 0;
@@ -114,7 +172,7 @@
   }
 
     .shortener__url-input__list {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Ubuntu', sans-serif;
     box-sizing: border-box;
     margin: 0 0 15px 0;
     height: 55px;
@@ -125,6 +183,12 @@
     font-size: 25px;
     padding: 10px;
     transition: all .1s;
+    word-break: break-all;
+    overflow: hidden;
+  }
+
+  #urls-list {
+    padding: 0;
   }
 
   .shortener__url-button:hover,

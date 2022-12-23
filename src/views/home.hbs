@@ -1,7 +1,14 @@
 <div>
   <div>
-    <h1 class="shortener__url-title" style="text-align: center;">Welcome to my awesome url shortener</h1>
-    <input type="button" class="shortener__url-button" onclick="window.location.href='/login'" value="Login">
-    <input type="button" class="shortener__url-button" onclick="window.location.href='/register'" value="register">
+    <h1 class="shortener__url-title-welcome">Welcome to my awesome url shortener</h1>
+    <input type="button" class="shortener__url-button" id="login" value="Login">
+    <input type="button" class="shortener__url-button" id="register" value="register">
   </div>
 </div>
+<script nonce={{scriptN}}>
+  function redirect() {
+    window.location.href='/' + event.currentTarget.id
+  }
+  document.getElementById("login").addEventListener("click", redirect, false)
+  document.getElementById("register").addEventListener("click", redirect, false)
+</script>

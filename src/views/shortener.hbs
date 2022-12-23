@@ -4,8 +4,8 @@
   <div>
     <h3 class="shortener__url-input">http://localhost:3000/url/{{shortenedUrl}}</h3>
     {{!-- add on click copy --}}
-    <input type="button" class="shortener__url-button" onclick="window.open('http://localhost:3000/url/{{shortenedUrl}}', '_blank').focus()" value="Go ahead and try it!">
-    <input type="button" class="shortener__url-button" onclick="window.location.href='/'" value="Shorten another url">
+    <input type="button" class="shortener__url-button" id="url" value="Go ahead and try it!">
+    <input type="button" class="shortener__url-button" id="home" value="Shorten another url">
   </div>
   {{else}}
   <form action="/shorten" method="post">
@@ -13,4 +13,23 @@
     <input type="submit" class="shortener__url-button" value="Go !">
   </form>
   {{/if}}
-  <input type="button" class="shortener__url-button" onclick="window.location.href='/user-urls'" value="User urls">
+  <input type="button" class="shortener__url-button" id="user-urls" value="User urls">
+  <script nonce={{scriptN}}>
+    const shortenedId = {{json shortenedUrl}}
+    function redirect() {
+      let direction = ''
+      if (event.currentTarget.id === 'url') {
+        return window.open(`http://localhost:3000/url/${shortenedId}`, '_blank').focus()
+      } else if (event.currentTarget.id === 'home') {
+        direction = '/'
+      } else {
+        direction = '/user-urls'
+      }
+      return window.location.href = direction
+    }
+    if (shortenedId) {
+      document.getElementById("url").addEventListener("click", redirect, false)
+      document.getElementById("home").addEventListener("click", redirect, false)
+    }
+    document.getElementById("user-urls").addEventListener("click", redirect, false)
+  </script>

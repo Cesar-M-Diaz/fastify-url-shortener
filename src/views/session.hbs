@@ -6,6 +6,9 @@
     <p class="shortener__error">{{error}}</p>
     {{/if}}
     <input type="submit" class="shortener__url-button" value={{button}}>
-    <input type="button" class="shortener__url-button" onclick="window.location.href='/welcome'" value="Home">
+    <input type="button" class="shortener__url-button" id='home' value="Home">
   </form>
 </div>
+<script nonce={{scriptN}}>
+  document.getElementById("home").addEventListener("click", () => window.location.href = '/welcome')
+</script>

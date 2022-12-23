@@ -1,10 +1,13 @@
 require('dotenv').config()
-// const fastify = require('fastify')({logger:true})
-const fastify = require('fastify')()
+const fastify = require('fastify')({ logger: true })
 const path = require('node:path')
 const handlebars = require('handlebars')
 const routes = require('./routes/routes')
 const migrate = require('./utils/migrate')
+
+fastify.register(require('@fastify/helmet'), { enableCSPNonces: true })
+
+fastify.register(require('fastify-bcrypt'), { saltWorkFactor: 12 })
 
 fastify.register(require('@fastify/postgres'), {
   host: process.env.HOST,
