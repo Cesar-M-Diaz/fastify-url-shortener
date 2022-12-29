@@ -31,7 +31,7 @@ fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '/../public')
 })
 
-fastify.register(require('@fastify/cookie'))
+fastify.register(require('@fastify/cookie'), { secret: process.env.COOKIE_SECRET })
 
 fastify.register(require('./plugins/authenticate'))
 

@@ -5,13 +5,14 @@ module.exports = fp(async function (fastify, opts) {
   fastify.register(require('@fastify/jwt'), {
     secret: process.env.SECRET_KEY,
     cookie: {
-      cookieName: 'token'
+      cookieName: 'token',
+      signed: true
     }
   })
 
   fastify.decorate('authenticate', async function (request, reply) {
     try {
-      await request.jwtVerify()
+      await request.jwtVerify({ onlyCookie: true })
       if (request.url === '/welcome' || request.url === '/login' || request.url === '/register') {
         return reply.redirect(302, '/')
       }

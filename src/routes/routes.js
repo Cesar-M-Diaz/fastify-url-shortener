@@ -61,12 +61,13 @@ function routes (fastify, options, done) {
         return reply.code(400).view('session.hbs', { error: 'wrong password', button: 'Login', action: '/login', email, password, ...nonce })
       }
 
-      const token = await fastify.jwt.sign({ id: rows[0].id }, { expiresIn: '1d' })
+      const token = await fastify.jwt.sign({ id: rows[0].id }, { expiresIn: 86400000 })
 
       return reply.setCookie('token', token, {
         // secure: true,
         httpOnly: true,
-        sameSite: true
+        sameSite: true,
+        signed: true
       }).redirect(302, '/')
     } catch (error) {
       return reply.send(error)
@@ -98,12 +99,13 @@ function routes (fastify, options, done) {
         'INSERT INTO users(id, email, password) VALUES($1, $2, $3) RETURNING *', [id, email, hash]
       )
 
-      const token = await fastify.jwt.sign({ id }, { expiresIn: '1d' })
+      const token = await fastify.jwt.sign({ id }, { expiresIn: 86400000 })
 
       return reply.setCookie('token', token, {
         // secure: true,
         httpOnly: true,
-        sameSite: true
+        sameSite: true,
+        signed: true
       }).redirect(302, '/')
     } catch (error) {
       return reply.send(error)
@@ -117,8 +119,15 @@ function routes (fastify, options, done) {
     const client = await fastify.pg.connect()
     const { url: urlString } = req.body
 
-    const user = fastify.jwt.decode(req.cookies.token)
-    const userId = user.id
+    const clearCookie = req.unsignCookie(req.cookies.token)
+    let user
+    let userId
+    if (clearCookie.valid) {
+      user = fastify.jwt.decode(clearCookie.value)
+      userId = user.id
+    } else {
+      return reply.code(409).view('error.hbs', { message: 'Something went wrong', ...nonce })
+    }
 
     if (req.validationError) return errorValidator(reply, req.validationError.message)
 
@@ -162,18 +171,26 @@ function routes (fastify, options, done) {
   })
 
   fastify.delete('/url/:urlId', async (req, reply) => {
+    const nonce = { scriptN: reply.cspNonce.script, styleN: reply.cspNonce.style }
     const client = await fastify.pg.connect()
     const { urlId } = req.params
 
-    const user = fastify.jwt.decode(req.cookies.token)
-    const userId = user.id
+    const clearCookie = req.unsignCookie(req.cookies.token)
+    let user
+    let userId
+    if (clearCookie.valid) {
+      user = fastify.jwt.decode(clearCookie.value)
+      userId = user.id
+    } else {
+      return reply.code(409).view('error.hbs', { message: 'Something went wrong', ...nonce })
+    }
 
     try {
       await client.query('DELETE FROM urls WHERE id=$1', [urlId])
       const { rows } = await client.query(
         'SELECT id, url FROM urls WHERE user_id=$1', [userId]
       )
-      return reply.code(200).view('user.hbs', { urls: rows, scriptN: reply.cspNonce.script, styleN: reply.cspNonce.style })
+      return reply.code(200).view('user.hbs', { urls: rows, ...nonce })
     } catch (e) {
       return reply.send(e)
     } finally {
