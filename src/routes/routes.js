@@ -1,6 +1,8 @@
+require('dotenv').config()
 const { shortenOpts, userOpts } = require('../schemas/schemas')
 const errorValidator = require('../utils/validationErr')
 const { v4: uuidv4 } = require('uuid')
+const bcrypt = require('bcrypt')
 
 function routes (fastify, options, done) {
   fastify.get('/welcome', { onRequest: [fastify.authenticate] }, async (req, reply) => {
@@ -50,15 +52,15 @@ function routes (fastify, options, done) {
       const { rows } = await client.query(
         'SELECT id, email, password FROM users WHERE email=$1 ', [email]
       )
-
+      // email or password is wrong, with this Im not helping the hacker
       if (!rows[0]?.email) {
-        return reply.code(400).view('session.hbs', { error: 'email not found, please enter a valid email', button: 'Login', action: '/login', email, password, ...nonce })
+        return reply.code(400).view('session.hbs', { error: 'wrong credentials, please try again', button: 'Login', action: '/login', email, password, ...nonce })
       }
 
-      const match = await fastify.bcrypt.compare(password, rows[0].password)
+      const match = await bcrypt.compare(password, rows[0].password)
 
       if (!match) {
-        return reply.code(400).view('session.hbs', { error: 'wrong password', button: 'Login', action: '/login', email, password, ...nonce })
+        return reply.code(400).view('session.hbs', { error: 'wrong credentials, please try again', button: 'Login', action: '/login', email, password, ...nonce })
       }
 
       const token = await fastify.jwt.sign({ id: rows[0].id }, { expiresIn: 86400000 })
@@ -93,7 +95,7 @@ function routes (fastify, options, done) {
       }
 
       const id = uuidv4()
-      const hash = await fastify.bcrypt.hash(password)
+      const hash = await bcrypt.hash(password, process.env.SALT)
 
       await client.query(
         'INSERT INTO users(id, email, password) VALUES($1, $2, $3) RETURNING *', [id, email, hash]
@@ -202,9 +204,15 @@ function routes (fastify, options, done) {
     reply.clearCookie('token', { path: '/' }).redirect(302, '/welcome')
   })
 
-  fastify.setNotFoundHandler((req, reply) => {
-    reply.view('error.hbs', { message: '404', subtitle: 'Page not found', scriptN: reply.cspNonce.script, styleN: reply.cspNonce.style })
-  })
+  fastify.setNotFoundHandler(
+    {
+      preHandler: fastify.rateLimit({
+        max: 4,
+        timeWindow: 60000
+      })
+    }, (req, reply) => {
+      reply.view('error.hbs', { message: '404', subtitle: 'Page not found', scriptN: reply.cspNonce.script, styleN: reply.cspNonce.style })
+    })
 
   done()
 }

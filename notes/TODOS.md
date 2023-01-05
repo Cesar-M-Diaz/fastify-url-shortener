@@ -24,4 +24,21 @@
 
 - improve the nonces implementation, pass by default something to handlebars ?
 
+- dos, prevent
+- improve salt and hash, read article <https://heynode.com/blog/2020-04/salt-and-hash-passwords-bcrypt/> ✅
+
 > We use Amazon RDS for postgres <https://aws.amazon.com/rds/postgresql/>
+
+- vps con digital ocean / 
+- droplet digital ocean 4 usd
+- ssh conección
+cómo conectarme con linux de droplet
+- montar node, ngnix, mi app y un servicio de system d para mi app
+- configurar nginx para que sirva la app por puerto 80
+- ponerle dominio a esa maquina virtual
+
+- blog nodesource system d nginx
+- cómo tener un dominio gratis
+- dominio comprado
+
+- así se hacía antes, control total.

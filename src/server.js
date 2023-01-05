@@ -7,8 +7,6 @@ const migrate = require('./utils/migrate')
 
 fastify.register(require('@fastify/helmet'), { enableCSPNonces: true })
 
-fastify.register(require('fastify-bcrypt'), { saltWorkFactor: 12 })
-
 fastify.register(require('@fastify/postgres'), {
   host: process.env.HOST,
   port: process.env.PORT,
@@ -32,6 +30,11 @@ fastify.register(require('@fastify/static'), {
 })
 
 fastify.register(require('@fastify/cookie'), { secret: process.env.COOKIE_SECRET })
+
+fastify.register(require('@fastify/rate-limit'), {
+  max: 100,
+  timeWindow: 60000
+})
 
 fastify.register(require('./plugins/authenticate'))
 
