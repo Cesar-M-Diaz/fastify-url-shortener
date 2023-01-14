@@ -7,7 +7,7 @@
 {{#each urls}}
   <li id={{id}} class="shortener__user-url__container">
     <div>
-      <h3 class="shortener__url-input__list" id='{{id}}input'>http://localhost:3000/url/{{id}}</h3>
+      <h3 class="shortener__url-input__list" id='{{id}}input'>http://{{../urlName}}/url/{{id}}</h3>
       <input type="button" class="shortener__url-button__list" id="{{id}}show" value="show original url">
     </div>
     <div>
@@ -27,10 +27,12 @@
   <input type="submit" class="shortener__url-button" value="log out">
 </form>
 <script nonce={{scriptN}}>
+  const urlName = {{json urlName}}
+
   function showUrl(id, url) {
     const input = document.getElementById(id+'input')
     const button = document.getElementById(id+'redirect')
-    const shortened = 'http://localhost:3000/url/' + id
+    const shortened = `http://${urlName}/url/${id}`
 
     if (input.innerText === url) {
       input.innerText = shortened
@@ -65,7 +67,7 @@
   function download(data) {
     // change the id attribute to have the complete shortened url
     const transformedData = data.map(obj => {
-      const newObj = { shortened: 'http://localhost:3000/url/' + obj.id, url: obj.url }
+      const newObj = { shortened: `http://${urlName}/url/${obj.id}`, url: obj.url }
       return newObj
     })
 
@@ -104,7 +106,7 @@
 
     listArray.forEach(element => {
       document.getElementById(`${element.id}show`).addEventListener('click', () => showUrl(element.id, urlsObj[element.id]))
-      document.getElementById(`${element.id}redirect`).addEventListener('click', () => window.open(`http://localhost:3000/url/${element.id}`, '_blank').focus())
+      document.getElementById(`${element.id}redirect`).addEventListener('click', () => window.open(`http://${urlName}/url/${element.id}`, '_blank').focus())
       document.getElementById(`${element.id}delete`).addEventListener('click', () => deleteURL(element.id))
     })
     document.getElementById('download').addEventListener('click', () => download(urls))
