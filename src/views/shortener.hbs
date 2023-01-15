@@ -2,7 +2,7 @@
   <h1 class="shortener__url-title">{{title}}</h1>
   {{#if shortenedUrl}}
   <div>
-    <h3 class="shortener__url-input">http://{{urlName}}/url/{{shortenedUrl}}</h3>
+    <h3 class="shortener__url-input">{{urlName}}/url/{{shortenedUrl}}</h3>
     {{!-- add on click copy --}}
     <input type="button" class="shortener__url-button" id="url" value="Go ahead and try it!">
     <input type="button" class="shortener__url-button" id="home" value="Shorten another url">
@@ -21,7 +21,7 @@
     function redirect() {
       let direction = ''
       if (event.currentTarget.id === 'url') {
-        return window.open(`http://${urlName}/url/${shortenedId}`, '_blank').focus()
+        return window.open(`${urlName}/url/${shortenedId}`, '_blank').focus()
       } else if (event.currentTarget.id === 'home') {
         direction = '/'
       } else {
