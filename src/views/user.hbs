@@ -42,9 +42,12 @@
     } else {
       input.innerText = url
       event.target.value = 'show shortened url'
-      if ((url.length > 50 && window.innerWidth < 1000 ) || url.length > 64) {
+      if ((url.length > 50 && url.length < 200 && window.innerWidth < 1000 ) || url.length > 64 && url.length < 200) {
         button.style.height = '110px'
         input.style.height = '110px'
+      } else if ((url.length > 50 && url.length > 200 && window.innerWidth < 1000 ) || url.length > 200) {
+        button.style.height = '170px'
+        input.style.height = '170px'
       }
     }
   }

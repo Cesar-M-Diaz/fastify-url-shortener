@@ -1,6 +1,5 @@
 require('dotenv').config()
 const fastify = require('fastify')({ logger: true })
-// const fastify = require('fastify')()
 const path = require('node:path')
 const handlebars = require('handlebars')
 const routes = require('./routes/routes')
@@ -27,7 +26,7 @@ fastify.register(require('@fastify/view'), {
 })
 
 fastify.register(require('@fastify/static'), {
-  root: path.join(__dirname, '/../public')
+  root: path.join(__dirname, '/public')
 })
 
 fastify.register(require('@fastify/cookie'), { secret: process.env.COOKIE_SECRET })
@@ -48,7 +47,7 @@ handlebars.registerHelper('json', function (obj) {
 const start = async () => {
   try {
     await migrate()
-    await fastify.listen({ port: 3000 })
+    await fastify.listen({ port: process.env.APPPORT })
   } catch (err) {
     fastify.log.error(err)
     process.exit(1)
