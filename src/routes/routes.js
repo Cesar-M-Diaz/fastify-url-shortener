@@ -4,7 +4,7 @@ const errorValidator = require('../utils/validationErr')
 const { v4: uuidv4 } = require('uuid')
 const bcrypt = require('bcrypt')
 
-const urlName = process.env.URLNAME
+const urlName = process.env.URL_NAME
 
 function routes (fastify, options, done) {
   fastify.get('/welcome', { onRequest: [fastify.authenticate] }, async (req, reply) => {
@@ -96,7 +96,7 @@ function routes (fastify, options, done) {
       }
 
       const id = uuidv4()
-      const hash = await bcrypt.hash(password, process.env.SALT)
+      const hash = await bcrypt.hash(password, 10)
 
       await client.query(
         'INSERT INTO users(id, email, password) VALUES($1, $2, $3) RETURNING *', [id, email, hash]

@@ -6,8 +6,8 @@ const path = require('path')
 
 async function migrate () {
   const client = new pg.Client({
-    host: process.env.HOST,
-    port: process.env.PORT,
+    host: process.env.PG_HOST,
+    port: process.env.PG_PORT,
     database: process.env.DATABASE,
     user: process.env.USER_POSTGRES,
     password: process.env.PASSWORD
@@ -17,9 +17,10 @@ async function migrate () {
     await client.connect()
 
     const postgrator = new Postgrator({
-      migrationPattern: path.join(__dirname, './migrations/*'),
+      migrationPattern: path.join(__dirname, '../../migrations/*'),
       driver: 'pg',
       database: 'urls',
+      schemaTable: 'migrations',
       execQuery: (query) => client.query(query)
     })
 
@@ -32,11 +33,8 @@ async function migrate () {
     } else {
       console.log('Migration done.')
     }
-
-    process.exitCode = 0
-  } catch (err) {
-    console.error(err)
-    process.exitCode = 1
+  } catch (error) {
+    console.error(error)
   }
 
   await client.end()

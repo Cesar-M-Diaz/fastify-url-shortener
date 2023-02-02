@@ -8,8 +8,8 @@ const migrate = require('./utils/migrate')
 fastify.register(require('@fastify/helmet'), { enableCSPNonces: true })
 
 fastify.register(require('@fastify/postgres'), {
-  host: process.env.HOST,
-  port: process.env.PORT,
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT,
   database: process.env.DATABASE,
   user: process.env.USER_POSTGRES,
   password: process.env.PASSWORD
@@ -47,7 +47,7 @@ handlebars.registerHelper('json', function (obj) {
 const start = async () => {
   try {
     await migrate()
-    await fastify.listen({ port: process.env.APPPORT })
+    await fastify.listen({ port: process.env.PORT, host: process.env.DOCKER ? '0.0.0.0' : 'localhost' })
   } catch (err) {
     fastify.log.error(err)
     process.exit(1)
