@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "node src/server.js",
-    "server": "nodemon src/server.js",
+    "dev": "nodemon src/server.js",
     "lint": "standard",
     "fix-lint": "standard --fix",
     "prepare": "husky install"
@@ -11,6 +11,7 @@
     "@fastify/formbody": "^7.3.0",
     "@fastify/helmet": "^10.1.0",
     "@fastify/jwt": "^6.4.0",
+    "@fastify/multipart": "^7.4.1",
     "@fastify/postgres": "^5.1.0",
     "@fastify/rate-limit": "^7.6.0",
     "@fastify/static": "^6.5.0",
@@ -20,6 +21,7 @@
     "dotenv": "^16.0.3",
     "fastify": "^4.9.1",
     "fastify-plugin": "^4.3.0",
+    "fastify-supabase": "^1.2.1",
     "handlebars": "^4.7.7",
     "husky": "^8.0.1",
     "nodemon": "^2.0.20",

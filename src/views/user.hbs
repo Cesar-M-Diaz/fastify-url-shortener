@@ -18,11 +18,12 @@
 {{/each}}
 </ul>
 {{#if urls}}
-  <input type="button" class="shortener__url-button" id="home" value="home">
   <input type="button" class="shortener__url-button" id="download" value="download urls">
+  <input type="button" class="shortener__url-button" id="shorten" value="Shorten another url">
 {{else}}
-  <input type="button" class="shortener__url-button" id="home" value="Shorten a url">
+  <input type="button" class="shortener__url-button" id="shorten" value="Shorten another url">
 {{/if}}
+<input type="button" class="shortener__url-button" id="home" value="return to options page">
 <form action="/logout" method="post">
   <input type="submit" class="shortener__url-button" value="log out">
 </form>
@@ -60,7 +61,7 @@
       document.getElementById(id).remove()
       if (document.getElementById('urls-list').innerText === '') {
         document.getElementById('title').innerHTML = "You don't have any saved urls"
-        document.getElementById('home').value = "Shorten a url"
+        document.getElementById('shorten').value = "Shorten another url"
       }
     } catch (e) {
       console.log(e)
@@ -115,4 +116,5 @@
     document.getElementById('download').addEventListener('click', () => download(urls))
   }
   document.getElementById('home').addEventListener('click', () => window.location = '/')
+  document.getElementById('shorten').addEventListener('click', () => window.location = '/shorten')
 </script>

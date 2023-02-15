@@ -1,8 +1,8 @@
 <div class="shortener__404">
   <h1 class="shortener__404-title">{{message}}</h1>
   <h2 class="shortener__url-subtitle">{{subtitle}}</h2>
-  <button class="shortener__url-button" id="home">Go Home</button>
+  <button class="shortener__url-button" id="back">Go Back</button>
 </div>
 <script nonce={{scriptN}}>
-  document.getElementById("home").addEventListener("click", () => window.location.href = '/')
+  document.getElementById("back").addEventListener("click", () => history.back())
 </script>

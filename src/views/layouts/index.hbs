@@ -8,54 +8,62 @@
   <link rel="icon" type="image/x-icon" href="/images/icon.svg">
 </head>
 <style nonce={{styleN}}>
-@font-face {
-  font-family: 'Silkscreen';
-  font-style: normal;
-  font-weight: 400;
-  src: url(/fonts/Silkscreen-Regular.ttf) format('trueType');
-}
+  
+  :root {
+    --base-color: #2B303B;
+    --button-color: #a1a1a1;
+    --button-color-2: white;
+    --hover-color: #494e59;
+  }
 
-@font-face {
-  font-family: 'Silkscreen';
-  font-style: normal;
-  font-weight: 700;
-  src: url(/fonts/Silkscreen-Bold.ttf) format('trueType');
-}
+  @font-face {
+    font-family: 'Silkscreen';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/fonts/Silkscreen-Regular.ttf) format('trueType');
+  }
 
-@font-face {
-  font-family: 'Ubuntu';
-  font-style: normal;
-  font-weight: 200;
-  src: url(/fonts/Ubuntu-Light.ttf) format('trueType');
-}
+  @font-face {
+    font-family: 'Silkscreen';
+    font-style: normal;
+    font-weight: 700;
+    src: url(/fonts/Silkscreen-Bold.ttf) format('trueType');
+  }
 
-@font-face {
-  font-family: 'Ubuntu';
-  font-style: normal;
-  font-weight: 300;
-  src: url(/fonts/Ubuntu-Regular.ttf) format('trueType');
-}
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 200;
+    src: url(/fonts/Ubuntu-Light.ttf) format('trueType');
+  }
 
-@font-face {
-  font-family: 'Ubuntu';
-  font-style: normal;
-  font-weight: 400;
-  src: url(/fonts/Ubuntu-Medium.ttf) format('trueType');
-}
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 300;
+    src: url(/fonts/Ubuntu-Regular.ttf) format('trueType');
+  }
 
-@font-face {
-  font-family: 'Ubuntu';
-  font-style: normal;
-  font-weight: 700;
-  src: url(/fonts/Ubuntu-Bold.ttf) format('trueType');
-}
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/fonts/Ubuntu-Medium.ttf) format('trueType');
+  }
+
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 700;
+    src: url(/fonts/Ubuntu-Bold.ttf) format('trueType');
+  }
 
   body {
     padding: 0;
     margin: 100px auto;
     min-height: 100%;
     width: 100%;
-    background-color: #FFF602;
+    background-color: var(--base-color);
     /* background-color: #08AEEA; */
     /* background-image: linear-gradient(0deg, #08AEEA 0%, #2AF598 100%); */
     display: flex;
@@ -91,6 +99,8 @@
     text-align: center;
   }
 
+  .store__file-url,
+  .store__select-file,
   .shortener__url-input {
     font-family: 'Ubuntu', sans-serif;
     box-sizing: border-box;
@@ -102,6 +112,34 @@
     font-weight: 300;
     font-size: 25px;
     padding: 10px;
+  }
+
+  .store__select-file {
+    padding: 0;
+  }
+
+  .store__file-url {
+    height: 100px;
+  }
+
+  input::file-selector-button {
+    font-family: 'Silkscreen', monospace;
+    cursor: pointer;
+    font-weight: bold;
+    height: 55px;
+    width: 300px;
+    border: none;
+    margin: 0;
+    margin-right: 20px;
+    border-radius: none;
+    transition: all .1s;
+    background-color: var(--button-color);
+    padding-bottom: 7px;
+  }
+
+  input[type="file"]::file-selector-button:hover {
+    background-color: var(--hover-color);
+    color: white;
   }
 
   .shortener__404 {
@@ -128,11 +166,19 @@
     width: 100%;
     font-family: 'Silkscreen', monospace;
     border-radius: 0;
-    background-color: #FFF602;
+    background-color: var(--button-color);
     color: black;
     transition: all .1s;
     border: 2px solid black;
     font-size: 25px;
+  }
+
+  .shortener__url-button:disabled:hover {
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+    background-color: var(--button-color);
+    color: black;
   }
 
   .shortener__error {
@@ -158,14 +204,14 @@
     width: 30%;
   }
 
-    .shortener__url-button__list {
+  .shortener__url-button__list {
     box-sizing: border-box;
     margin: 0 0 15px 0;
     height: 55px;
     width: 100%;
     font-family: 'Silkscreen', monospace;
     border-radius: 0;
-    background-color: #FFF602;
+    background-color: var(--button-color);
     color: black;
     transition: all .1s;
     border: 2px solid black;
@@ -197,6 +243,8 @@
     cursor: pointer;
     transform: translateY(-5px);
     box-shadow: -5px 10px 0px 3px rgba(0,0,0,1);
+    background-color: var(--hover-color);
+    color: white;
   }
 
 </style>

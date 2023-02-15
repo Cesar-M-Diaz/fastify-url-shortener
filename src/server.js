@@ -36,6 +36,23 @@ fastify.register(require('@fastify/rate-limit'), {
   timeWindow: 60000
 })
 
+fastify.register(require('fastify-supabase'), {
+  supabaseKey: process.env.SUPA_KEY,
+  supabaseUrl: process.env.SUPA_URL
+})
+
+fastify.register(require('@fastify/multipart'), {
+  limits: {
+    fieldNameSize: 100, // Max field name size in bytes
+    fieldSize: 100, // Max field value size in bytes
+    fields: 10, // Max number of non-file fields
+    fileSize: 10000000, // For multipart forms, the max file size in bytes
+    files: 1, // Max number of file fields
+    headerPairs: 2000, // Max number of header key=>value pairs
+    parts: 1000 // For multipart forms, the max number of parts (fields + files)
+  }
+})
+
 fastify.register(require('./plugins/authenticate'))
 
 fastify.register(routes)

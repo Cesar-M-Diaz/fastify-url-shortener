@@ -1,14 +1,16 @@
 <div>
   <div>
-    <h1 class="shortener__url-title-welcome">Welcome to my awesome url shortener</h1>
-    <input type="button" class="shortener__url-button" id="login" value="Login">
-    <input type="button" class="shortener__url-button" id="register" value="register">
+    <h1 class="shortener__url-title-welcome">Please select an option</h1>
+    <div class="shortener__options-container">
+      <input type="button" class="shortener__url-button" id="shorten" value="Shorten a url">
+      <input type="button" class="shortener__url-button" id="store" value="Store a file">
+    </div>
   </div>
 </div>
 <script nonce={{scriptN}}>
   function redirect() {
     window.location.href='/' + event.currentTarget.id
   }
-  document.getElementById("login").addEventListener("click", redirect, false)
-  document.getElementById("register").addEventListener("click", redirect, false)
+  document.getElementById("shorten").addEventListener("click", redirect, false)
+  document.getElementById("store").addEventListener("click", redirect, false)
 </script>

@@ -20,7 +20,7 @@ async function migrate () {
       migrationPattern: path.join(__dirname, '../../migrations/*'),
       driver: 'pg',
       database: process.env.DATABASE,
-      schemaTable: 'migrations',
+      schemaTable: process.env.MIGRATION_NAME,
       execQuery: (query) => client.query(query)
     })
 

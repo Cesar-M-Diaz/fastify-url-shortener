@@ -1,0 +1,45 @@
+<div>
+  <h1 class="shortener__url-title">{{title}}</h1>
+  {{#if storedFileUrl}}
+  <div>
+    <h3 class="store__file-url">{{storedFileUrl}}</h3>
+    {{!-- add on click copy --}}
+    <input type="button" class="shortener__url-button" id="url" value="Go ahead and try it!">
+    <input type="button" class="shortener__url-button" id="store" value="store another file">
+  </div>
+  {{else}}
+  <form action="/upload-file" method="post" enctype="multipart/form-data">
+    <input class="store__select-file" type="file" name="myFile" id="myFile">
+    <input type="submit" class="shortener__url-button" value="Upload !" id="upload" disabled>
+  </form>
+  {{/if}}
+  <input type="button" class="shortener__url-button" id="home" value="return to options page">
+  <script nonce={{scriptN}}>
+    const storedFileUrl = {{json storedFileUrl}}
+    function redirect() {
+      let direction = ''
+      if (event.currentTarget.id === 'url') {
+        return window.open(`${storedFileUrl}`, '_blank').focus()
+      } else if (event.currentTarget.id === 'home') {
+        direction = '/'
+      } else if (event.currentTarget.id === 'store'){
+        direction = '/store'
+      }
+      return window.location.href = direction
+    }
+
+    if (storedFileUrl) {
+      document.getElementById("url").addEventListener("click", redirect, false)
+      document.getElementById("store").addEventListener("click", redirect, false)
+    } else {
+      document.getElementById("myFile").addEventListener('change', function(event) {
+        if (event.target.files.length > 0) {
+          document.getElementById("upload").disabled = false
+        } else {
+          document.getElementById("upload").disabled = true
+        }
+      })
+    }
+
+    document.getElementById("home").addEventListener("click", redirect, false)
+  </script>
