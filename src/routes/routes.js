@@ -4,12 +4,14 @@ const errorValidator = require('../utils/validationErr')
 const { v4: uuidv4 } = require('uuid')
 const bcrypt = require('bcrypt')
 const { Worker } = require('worker_threads')
+const qs = require('querystring')
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args))
 
 const urlName = process.env.URL_NAME
 
 function routes (fastify, options, done) {
   fastify.get('/welcome', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    await reply.code(200).view('landing.hbs')
+    await reply.code(200).view('landing.hbs', { scriptN: reply.cspNonce.script, styleN: reply.cspNonce.style, urlName })
   })
 
   fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
@@ -30,6 +32,82 @@ function routes (fastify, options, done) {
 
   fastify.get('/login', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     await reply.code(200).view('session.hbs', { button: 'Login', action: '/login', scriptN: reply.cspNonce.script, styleN: reply.cspNonce.style })
+  })
+
+  fastify.get('/login-social', (req, reply) => {
+    const { type } = req.query
+
+    let socialProvider
+    if (type === 'google') {
+      socialProvider = 'google-oauth2'
+    } else if (type === 'github') {
+      socialProvider = type
+    }
+
+    // const nonce = uuidv4()
+
+    const queryString = qs.stringify({
+      client_id: process.env.AUTH0_CLIENT_ID,
+      response_type: 'code',
+      scope: 'openid email profile',
+      // state: nonce,
+      redirect_uri: (process.env.URL_NAME + '/redirect'),
+      connection: socialProvider
+    })
+
+    const url = `https://${process.env.AUTH0_DOMAIN}/authorize?${queryString}`
+    reply.redirect(302, url)
+  })
+
+  fastify.get('/redirect', async (req, reply) => {
+    const client = await fastify.pg.connect()
+    const { code } = req.query
+
+    const body = {
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: (process.env.URL_NAME + '/redirect'),
+      client_id: process.env.AUTH0_CLIENT_ID,
+      client_secret: process.env.AUTH0_CLIENT_SECRET
+    }
+
+    let response
+    response = await fetch(`https://${process.env.AUTH0_DOMAIN}/oauth/token`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+
+    response = await response.json()
+
+    const decodedToken = await fastify.jwt.decode(response.id_token)
+    const email = decodedToken.email ? decodedToken.email : decodedToken.nickname
+
+    const { rows } = await client.query(
+      'SELECT id, email FROM users WHERE email=$1 ', [email]
+    )
+
+    let token
+    if (rows.length === 0) {
+      const id = uuidv4()
+      await client.query(
+        'INSERT INTO users(id, email, password) VALUES($1, $2, $3) RETURNING *', [id, email, 'sso_user']
+      )
+      token = await fastify.jwt.sign({ id, sso: true }, { expiresIn: 86400000 })
+    } else if (rows[0].email) {
+      token = await fastify.jwt.sign({ id: rows[0].id, sso: true }, { expiresIn: 86400000 })
+    } else {
+      return
+    }
+
+    return reply.setCookie('token', token, {
+      // secure: true,
+      httpOnly: true,
+      sameSite: true,
+      signed: true
+    }).redirect(302, '/')
   })
 
   fastify.get('/user-urls', { onRequest: [fastify.authenticate] }, async (req, reply) => {
@@ -170,41 +248,50 @@ function routes (fastify, options, done) {
     const nonce = { scriptN: reply.cspNonce.script, styleN: reply.cspNonce.style }
     const supabase = fastify.supabase
 
-    const clearCookie = req.unsignCookie(req.cookies.token)
-    // let user
-    // let userId
-    if (clearCookie.valid) {
-      fastify.jwt.decode(clearCookie.value)
-      // user = fastify.jwt.decode(clearCookie.value)
-      // userId = user.id
-    } else {
-      return reply.code(409).view('error.hbs', { message: 'Something went wrong', ...nonce })
+    try {
+      const clearCookie = req.unsignCookie(req.cookies.token)
+      let user
+      let userId
+      if (clearCookie.valid) {
+        fastify.jwt.decode(clearCookie.value)
+        user = fastify.jwt.decode(clearCookie.value)
+        userId = user.id
+      }
+
+      if (req.validationError) return errorValidator(reply, req.validationError.message)
+
+      // get the file and store it in buffer, then send to supabase and return public URL
+      const fileData = await req.file()
+      const buffer = await fileData.toBuffer()
+
+      if (buffer.length === 0) {
+        return reply.code(400).view('error.hbs', { message: '400', subtitle: 'No file to upload', ...nonce })
+      }
+
+      const fileId = uuidv4()
+      const { error: uploadError } = await supabase
+        .storage
+        .from(process.env.SUPA_BUCKET)
+        .upload(`${userId}/${fileId}`, buffer)
+
+      if (uploadError) {
+        return reply.code(uploadError.statusCode).view('error.hbs', { message: uploadError.statusCode, subtitle: uploadError.message, ...nonce })
+      }
+
+      const { publicURL, error: getUrlError } = supabase
+        .storage
+        .from('fastify-bucket')
+        .getPublicUrl(`${userId}/${fileId}`)
+
+      if (getUrlError) {
+        return reply.code(getUrlError.statusCode).view('error.hbs', { message: getUrlError.statusCode, subtitle: getUrlError.message, ...nonce })
+      }
+      return reply.code(201).view('store.hbs', { title: 'Heres your file url', storedFileUrl: publicURL, ...nonce })
+    } catch (e) {
+      if (e.message === 'Signed cookie string must be provided.') {
+        return reply.code(401).view('error.hbs', { message: 'You are not authorized, please register or log in', ...nonce })
+      }
     }
-
-    if (req.validationError) return errorValidator(reply, req.validationError.message)
-
-    // get the file and store it in buffer, then send to supabase and return public URL
-    const fileData = await req.file()
-    const buffer = await fileData.toBuffer()
-
-    const { error: uploadError } = await supabase
-      .storage
-      .from(process.env.SUPA_BUCKET)
-      .upload(`${process.env.SUPA_FOLDER}/${fileData.filename}`, buffer)
-
-    if (uploadError) {
-      return reply.code(uploadError.statusCode).view('error.hbs', { message: uploadError.statusCode, subtitle: uploadError.message, ...nonce })
-    }
-
-    const { publicURL, error: getUrlError } = supabase
-      .storage
-      .from('fastify-bucket')
-      .getPublicUrl(`store-app/${fileData.filename}`)
-
-    if (getUrlError) {
-      return reply.code(getUrlError.statusCode).view('error.hbs', { message: getUrlError.statusCode, subtitle: getUrlError.message, ...nonce })
-    }
-    return reply.code(201).view('store.hbs', { title: 'Heres your file url', storedFileUrl: publicURL, ...nonce })
   })
 
   fastify.get('/url/:urlId', async (req, reply) => {
@@ -254,8 +341,25 @@ function routes (fastify, options, done) {
     }
   })
 
-  fastify.post('/logout', (req, reply) => {
-    reply.clearCookie('token', { path: '/' }).redirect(302, '/welcome')
+  fastify.post('/logout', async (req, reply) => {
+    const clearCookie = req.unsignCookie(req.cookies.token)
+    let cookieObj
+    let sso = false
+    if (clearCookie.valid) {
+      cookieObj = fastify.jwt.decode(clearCookie.value)
+      sso = cookieObj.sso
+    }
+
+    if (sso) {
+      try {
+        await fetch(`https://${process.env.AUTH0_DOMAIN}/v2/logout?client_id=${process.env.AUTH0_CLIENT_ID}&returnTo=${(process.env.URL_NAME + '/welcome#start')}`, {
+          method: 'GET'
+        })
+      } catch (err) {
+        reply.send(err)
+      }
+    }
+    reply.clearCookie('token', { path: '/' }).redirect(302, '/welcome#start')
   })
 
   fastify.setNotFoundHandler({
