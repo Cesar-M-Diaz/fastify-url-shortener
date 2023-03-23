@@ -1,72 +1,29 @@
-require('dotenv').config()
-const fastify = require('fastify')({ logger: true })
-const path = require('node:path')
-const handlebars = require('handlebars')
-const routes = require('./routes/routes')
 const migrate = require('./utils/migrate')
 
-fastify.register(require('@fastify/helmet'), { enableCSPNonces: true })
-
-fastify.register(require('@fastify/postgres'), {
-  host: process.env.PG_HOST,
-  port: process.env.PG_PORT,
-  database: process.env.DATABASE,
-  user: process.env.USER_POSTGRES,
-  password: process.env.PASSWORD
-})
-
-fastify.register(require('@fastify/formbody'))
-
-fastify.register(require('@fastify/view'), {
-  root: path.join(__dirname, 'views'),
-  engine: {
-    handlebars
+const envToLogger = {
+  development: {
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        translateTime: 'HH:MM:ss Z',
+        ignore: 'pid,hostname'
+      }
+    }
   },
-  layout: 'layouts/index.hbs'
-})
+  production: true,
+  test: false
+}
 
-fastify.register(require('@fastify/static'), {
-  root: path.join(__dirname, '/public')
-})
-
-fastify.register(require('@fastify/cookie'), { secret: process.env.COOKIE_SECRET })
-
-fastify.register(require('@fastify/rate-limit'), {
-  max: 100,
-  timeWindow: 60000
-})
-
-fastify.register(require('fastify-supabase'), {
-  supabaseKey: process.env.SUPA_KEY,
-  supabaseUrl: process.env.SUPA_URL
-})
-
-fastify.register(require('@fastify/multipart'), {
-  limits: {
-    fieldNameSize: 100, // Max field name size in bytes
-    fieldSize: 100, // Max field value size in bytes
-    fields: 10, // Max number of non-file fields
-    fileSize: 10000000, // For multipart forms, the max file size in bytes
-    files: 1, // Max number of file fields
-    headerPairs: 2000, // Max number of header key=>value pairs
-    parts: 1000 // For multipart forms, the max number of parts (fields + files)
-  }
-})
-
-fastify.register(require('./plugins/authenticate'))
-
-fastify.register(routes)
-
-handlebars.registerHelper('json', function (obj) {
-  return new handlebars.SafeString(JSON.stringify(obj))
+const server = require('./app.js')({
+  logger: envToLogger[process.env.NODE_ENV] ?? true
 })
 
 const start = async () => {
   try {
     await migrate()
-    await fastify.listen({ port: process.env.PORT, host: process.env.DOCKER ? '0.0.0.0' : 'localhost' })
+    await server.listen({ port: process.env.PORT, host: process.env.DOCKER ? '0.0.0.0' : 'localhost' })
   } catch (err) {
-    fastify.log.error(err)
+    server.log.error(err)
     process.exit(1)
   }
 }
