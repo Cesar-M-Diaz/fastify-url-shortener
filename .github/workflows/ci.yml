@@ -41,9 +41,9 @@ jobs:
       run: |
         touch .env
         echo PASSWORD="postgres" >> .env
-        echo DOCKER="true" >> .env
+        # echo DOCKER="true" >> .env
         echo USER_POSTGRES="postgres" >> .env
-        echo PG_HOST="postgres" >> .env
+        echo PG_HOST="localhost" >> .env
         echo PG_PORT=5432 >> .env
         echo DATABASE="urls" >> .env
         echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
@@ -64,3 +64,4 @@ jobs:
       with:
         browser: chrome
         start: npm start
+        wait-on: "http://localhost:3000"
