@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test:
+
+    runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: urls
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: "18.x"
+    - name: Install dependencies
+      run: npm install
+    - name: create env file
+      run: |
+        touch .env
+        echo PASSWORD="postgres" >> .env
+        # echo DOCKER="true" >> .env
+        echo USER_POSTGRES="postgres" >> .env
+        echo PG_HOST="localhost" >> .env
+        echo PG_PORT=5432 >> .env
+        echo DATABASE="urls" >> .env
+        echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+        echo COOKIE_SECRET=${{ secrets.COOKIE_SECRET }} >> .env
+        echo MIGRATION_NAME="schemaversion" >> .env
+        echo URL_NAME="http://localhost:3000" >> .env
+        echo SUPA_KEY=${{ secrets.SUPA_KEY }} >> .env
+        echo SUPA_URL=${{ secrets.SUPA_URL }} >> .env
+        echo SUPA_BUCKET="fastify-bucket" >> .env
+        echo AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }} >> .env
+        echo AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }} >> .env
+        echo AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }} >> .env
+    - name: Run unit tests
+      run: npm test
+
+    - name: Cypress run
+      uses: cypress-io/github-action@v5
+      with:
+        browser: chrome
+        start: npm run start-ci
+        wait-on: "http://localhost:3000"

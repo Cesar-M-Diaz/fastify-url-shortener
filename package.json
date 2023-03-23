@@ -1,7 +1,37 @@
 {
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "tap": {
+    "check-coverage": false
+  },
+  "standard": {
+    "globals": [
+      "AbortController",
+      "after",
+      "afterEach",
+      "Cypress",
+      "before",
+      "beforeEach",
+      "expect",
+      "describe",
+      "it",
+      "test",
+      "FileReader",
+      "DataTransfer",
+      "File",
+      "cy",
+      "jest"
+    ]
+  },
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "NODE_ENV=production node src/server.js",
+    "dev": "NODE_ENV=development nodemon src/server.js",
+    "start-ci": "NODE_ENV=test node src/server.js",
+    "cypress:open": "cypress open",
+    "test": "tap",
+    "posttest":  "tap --coverage-report=html --no-browser",
+    "delete": "rm -rf node_modules/ && rm package-lock.json",
     "lint": "standard",
     "fix-lint": "standard --fix",
     "prepare": "husky install"
@@ -27,10 +57,15 @@
     "node-fetch": "^3.3.0",
     "nodemon": "^2.0.20",
     "pg": "^8.8.0",
-    "pino-pretty": "^9.1.1",
     "postgrator": "^5.0.1",
     "standard": "^17.0.0",
     "uuid": "^9.0.0",
     "warehouse": "^4.0.2"
+  },
+  "devDependencies": {
+    "pino-pretty": "^9.1.1",
+    "cypress": "^12.8.1",
+    "npm-run-all": "^4.1.5",
+    "tap": "^16.3.4"
   }
 }

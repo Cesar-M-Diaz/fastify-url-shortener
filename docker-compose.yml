@@ -12,7 +12,6 @@ services:
       - ./.env
     environment:
       - PG_HOST=postgres
-      - SALT="$2b$10$ppHrWgZ096XlSEctzDPYku"
       - PASSWORD=postgres
       - DOCKER=true
     links:
