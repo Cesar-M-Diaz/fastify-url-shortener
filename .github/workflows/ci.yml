@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build_and_test:
 
     runs-on: ubuntu-latest
     services:
@@ -63,5 +63,5 @@ jobs:
       uses: cypress-io/github-action@v5
       with:
         browser: chrome
-        start: npm start
+        start: npm run start-ci
         wait-on: "http://localhost:3000"
