@@ -21,7 +21,7 @@ const server = require('./app.js')({
 const start = async () => {
   try {
     await migrate()
-    await server.listen({ port: process.env.PORT, host: process.env.DOCKER ? '0.0.0.0' : 'localhost' })
+    await server.listen({ port: process.env.PORT || 3000, host: process.env.DOCKER ? '0.0.0.0' : 'localhost' })
   } catch (err) {
     server.log.error(err)
     process.exit(1)
