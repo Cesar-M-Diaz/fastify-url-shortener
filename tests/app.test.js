@@ -44,6 +44,7 @@ test('requests the "/login" route', async t => {
     method: 'GET',
     url: '/login'
   })
+  // test
 
   t.equal(response.statusCode, 200, 'returns a status code of 200')
 })
