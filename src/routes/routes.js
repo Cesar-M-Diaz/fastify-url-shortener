@@ -371,7 +371,7 @@ function routes (fastify, options, done) {
     reply.view('error.hbs', { message: '404', subtitle: 'Page not found', scriptN: reply.cspNonce.script, styleN: reply.cspNonce.style })
   })
 
-  const THREAD_COUNT = 3
+  const THREAD_COUNT = 5
   function createWorker () {
     return new Promise(function (resolve, reject) {
       const worker = new Worker('./worker.js', {

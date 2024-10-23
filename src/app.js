@@ -38,10 +38,10 @@ function buildApp (opts = {}) {
     timeWindow: 60000
   })
 
-  app.register(require('fastify-supabase'), {
-    supabaseKey: process.env.SUPA_KEY,
-    supabaseUrl: process.env.SUPA_URL
-  })
+  // app.register(require('fastify-supabase'), {
+  //   supabaseKey: process.env.SUPA_KEY,
+  //   supabaseUrl: process.env.SUPA_URL
+  // })
 
   app.register(require('@fastify/multipart'), {
     limits: {
